@@ -14,19 +14,25 @@ class FeedFowardAI
         int inputNodeCount;   // CALC & CALC  - representing how many input node we have
         int hiddenNodeCount;  // CALC & CALC  - representing how many hidden node we have
         int outputNodeCount;  // CALC & CALC  - representing how many output node we have
-        float learningRate;   // CALC & CALC  - representing the learning rate
+        //float learningRate;   // CALC & CALC  - representing the learning rate
 
         Matrix WeightsInputHidden;
         Matrix WeightsHiddenOutput;
 
     public:
-        FeedFowardAI();
+        FeedFowardAI(int inputNodeCount, int hiddenNodeCount, int outputNodeCount);
         ~FeedFowardAI();
 
         
+        vector<float> query(vector<float> inputVector);
+        void trainForOneTime(vector<float> inputVec, vector<float> targetVec);
+        
         void initialWeightMatrix();
+        void displayWeightMatrix();
+        
 
     private:
         //This part is helping us to do some culculating 
         static float sigmoid(float inputValue);
+        static void activationFunction(Matrix& inputVec);
 };

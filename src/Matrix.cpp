@@ -95,8 +95,8 @@ Matrix operator*(float scaler, Matrix mat)
 Matrix Matrix::operator+(Matrix & rightMatrix)
 {
 	Matrix result(this->rowCount, this->colCount);
-	auto iterRRow = this->matrix.begin();
-	auto iterLRow = rightMatrix.matrix.begin();
+	auto iterRRow = rightMatrix.matrix.begin();
+	auto iterLRow = this->matrix.begin();
 
 	for (int rowCount = 0; rowCount < this->rowCount; rowCount++)
 	{
@@ -112,10 +112,31 @@ Matrix Matrix::operator+(Matrix & rightMatrix)
 }
 
 
+//************************************************************
+Matrix Matrix::operator-(Matrix &rightMatrix)
+{
+	Matrix result(this->rowCount, this->colCount);
+	auto iterRRow = rightMatrix.matrix.begin();
+	auto iterLRow = this->matrix.begin();
+
+	for (int rowCount = 0; rowCount < this->rowCount; rowCount++)
+	{
+		for (int colCount = 0; colCount < this->colCount; colCount++)
+		{
+			result.matrix[rowCount][colCount] =  (*iterLRow)[colCount] - (*iterRRow)[colCount] ;
+		}
+		iterRRow++;
+		iterLRow++;
+	}
+
+	return result;
+}
+
+
 Matrix& Matrix::operator=(const Matrix &mat)
 {
 	this->rowCount = mat.rowCount;
-	this->colCount = mat.rowCount;
+	this->colCount = mat.colCount;
 	this->matrix = mat.matrix;
 
 	return *this;
@@ -135,10 +156,11 @@ ostream & operator<<(ostream & os, const Matrix & matrix)
 	cout << "========== Display the Matrix ==========" << endl;
 	for (auto &row : matrix.matrix)
 	{
-		os << left << setw(3) << "|";
+		cout << fixed << setprecision(3);
+		os << "|";
 		for (auto &element : row)
 		{
-			os << left << setw(3) << element;
+			os << left << setw(Matrix::MARGINE_SIZE) << element;
 		}
 		os << "|"<< endl;
 	}
@@ -146,26 +168,29 @@ ostream & operator<<(ostream & os, const Matrix & matrix)
 	return os;
 }
 
-Matrix Matrix::transpose()
-{
-	vector<vector<float> > matrixHolder;
-	matrixHolder.resize(this->colCount);
-	for(auto &row : matrixHolder)
-	{
-		row.resize(this->rowCount);
-	}
 
+vector<float>& Matrix::operator[](int index)
+{
+	return this->matrix[index];
+}
+
+
+//需要修改
+Matrix& Matrix::transpose()
+{
+
+	Matrix transposeMatrix;
+	transposeMatrix.setMatrixSize(this->colCount,this->rowCount);
 
 	for(int rowIndex = 0; rowIndex < this->rowCount; rowIndex++)
 	{
 		for(int colIndex = 0; colIndex < this->colCount; colIndex++)
 		{
-			matrixHolder[colIndex][rowIndex] = this->matrix[rowIndex][colIndex];
+			transposeMatrix[colIndex][rowIndex] = this->matrix[rowIndex][colIndex];
 		}
 
 	}
-
-	*this = Matrix(matrixHolder);
+	this->setMatrix(transposeMatrix.matrix);
 
 	return *this;
 }
@@ -176,13 +201,46 @@ void Matrix::setMatrixSize(int rowCount, int colCount)
 	this->rowCount = rowCount;
 	this->colCount = colCount;
 	
-	this->matrix.resize(this->colCount);
+	this->matrix.resize(this->rowCount);
 	for(auto &row : this->matrix)
 	{
-		row.resize(this->rowCount);
+		row.resize(this->colCount);
 	}
 	
 }
+
+void Matrix::setMatrix(vector<vector<float> > matrix)
+{
+	this->matrix = matrix;
+	this->rowCount = this->matrix.size();
+	this->colCount = this->matrix[0].size();
+}
+
+
+vector<float> Matrix::getVector()
+{
+	if(this->colCount == 1)
+	{
+		transpose();
+	}
+	return this->matrix[0];
+}
+
+
+
+int Matrix::getRowCount()
+{
+	return this->rowCount;
+}
+
+int Matrix::getColCount()
+{
+	return this->colCount;
+}
+
+
+
+
 
 
 // For vector addition
@@ -229,3 +287,11 @@ vector<float> Matrix::LinearCombiVectorMatrix(vector<float> vec,const Matrix& ma
 
 	return outputVec;
 }
+
+
+void Matrix::displayMatrixSize()
+{
+	cout << "matrix row size = " << this->rowCount << " : " << this->matrix.size() << endl;
+	cout << "matrix col size = " << this->colCount << " : " << this->matrix[0].size() << endl;
+}
+
