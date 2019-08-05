@@ -1,10 +1,11 @@
 #include "FeedFowardAI.hpp"
 
-FeedFowardAI::FeedFowardAI(int inputNodeCount, int hiddenNodeCount, int outputNodeCount)
+FeedFowardAI::FeedFowardAI(int inputNodeCount, int hiddenNodeCount, int outputNodeCount, float learningRate)
 {
     this->inputNodeCount = inputNodeCount;
     this->hiddenNodeCount = hiddenNodeCount;
     this->outputNodeCount = outputNodeCount;
+    setLearningRate(learningRate);
     initialWeightMatrix();
 }
 
@@ -68,39 +69,69 @@ vector<float> FeedFowardAI::query(vector<float> inputVector)
 }
 
 
-//修改當中
+
 //*********************************************************************************
 void FeedFowardAI::trainForOneTime(vector<float> inputVec, vector<float> targetVec)
 {
     // Step1: calculate the output vector(Both finalOutput and hiddenOutput)
     Matrix inputMat(vector<vector<float> > {inputVec});  //CALC & CALC  - represeting the input vector
-    Matrix outputMat;                                    //CALC & CALC  - use as a holder for abstracting hiddenOutput and finalOutput
+    Matrix tempMat;                                    //CALC & CALC  - use as a holder for abstracting hiddenOutput and finalOutput
     vector<float> hiddenOutputVec;                       //CALC & OUT   - representing the hidden output vector
     vector<float> finalOutputVec;                        //CALC & OUT   - representing the final output vector
 
-    outputMat = this->WeightsInputHidden * inputMat.transpose();
-    this->activationFunction(outputMat);
-    hiddenOutputVec = outputMat.getVector();
-    outputMat = this->WeightsHiddenOutput * outputMat;
-    this->activationFunction(outputMat);
-    finalOutputVec = outputMat.getVector();
+    tempMat = this->WeightsInputHidden * inputMat.transpose();
+    this->activationFunction(tempMat);
+    hiddenOutputVec = tempMat.getVector();
+    tempMat = this->WeightsHiddenOutput * tempMat;
+    this->activationFunction(tempMat);
+    finalOutputVec = tempMat.getVector();
     
     
     // Step2: calculate the error
     //              outputError = |targetVec - outputVec|
     //              hiddenError = | weightHiddenOutput.transpose * outputError|
-    Matrix outputErrorMat;
-    Matrix hiddenErrorMat;
-    
+    Matrix outputErrorMat;                                                //CALC & CALC
+    Matrix hiddenErrorMat;                                                //CALC & CALC
+    Matrix targetVecMat {vector<vector<float> > {targetVec}};             //CALC & CALC
+    Matrix finalOutputVecMat {vector<vector<float> > {finalOutputVec}};   //CALC & CALC
+    Matrix hiddenOutputVecMat {vector<vector<float> > {hiddenOutputVec}};  //CALC & CALC
+        
+
+    outputErrorMat = targetVecMat - finalOutputVecMat;
+    hiddenErrorMat = this->WeightsHiddenOutput.transpose() - outputErrorMat.transpose();
+    this->WeightsHiddenOutput.transpose();
+    outputErrorMat.transpose();
+    hiddenErrorMat.transpose();
 
 
 
-    
+    // Step 3: update the weight matrix
+    Matrix updateWHO;
+    Matrix updateWIH;
 
+    updateWHO = this->learningRate * 
+                outputErrorMat.corresＭutiVV(
+                finalOutputVecMat.corresＭutiVV(
+                (1 - finalOutputVecMat))).transpose() * 
+                hiddenOutputVecMat;
+
+    updateWIH = this->learningRate *
+                hiddenErrorMat.corresＭutiVV(
+                hiddenOutputVecMat.corresＭutiVV(
+                (1 - hiddenOutputVecMat))).transpose() *
+                inputMat;
+
+    this->WeightsHiddenOutput = this->WeightsHiddenOutput + updateWHO;
+    this->WeightsInputHidden  = this->WeightsInputHidden  + updateWIH;
+        
 }
 
 
 
+void FeedFowardAI::setLearningRate(float learningRate)
+{
+    this->learningRate = learningRate;
+}
 
 
 //*********************************************************************************

@@ -14,13 +14,13 @@ class FeedFowardAI
         int inputNodeCount;   // CALC & CALC  - representing how many input node we have
         int hiddenNodeCount;  // CALC & CALC  - representing how many hidden node we have
         int outputNodeCount;  // CALC & CALC  - representing how many output node we have
-        //float learningRate;   // CALC & CALC  - representing the learning rate
+        float learningRate;   // CALC & CALC  - representing the learning rate
 
         Matrix WeightsInputHidden;
         Matrix WeightsHiddenOutput;
 
     public:
-        FeedFowardAI(int inputNodeCount, int hiddenNodeCount, int outputNodeCount);
+        FeedFowardAI(int inputNodeCount, int hiddenNodeCount, int outputNodeCount, float learningRate);
         ~FeedFowardAI();
 
         
@@ -29,6 +29,8 @@ class FeedFowardAI
         
         void initialWeightMatrix();
         void displayWeightMatrix();
+
+        void setLearningRate(float learningRate);
         
 
     private:

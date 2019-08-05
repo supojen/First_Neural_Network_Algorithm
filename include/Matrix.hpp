@@ -31,6 +31,10 @@ class Matrix
 
 		Matrix& transpose();
 
+		// The following two function is for helping updating the weight of feed forward AI
+		Matrix corresＭutiVV(Matrix vector); 
+		friend Matrix operator-(int number, Matrix &vecMat);
+
 		void setMatrixSize(int rowCount, int colCount);
 		void setMatrix(vector<vector<float> >);
 

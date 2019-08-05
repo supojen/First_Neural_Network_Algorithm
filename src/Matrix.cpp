@@ -238,8 +238,49 @@ int Matrix::getColCount()
 	return this->colCount;
 }
 
+// Correspond Multiplication for Vector and Vector
+Matrix Matrix::corresＭutiVV(Matrix vec)
+{
+	vector<float> outVec;
+
+	if(this->colCount == 1)
+		this->transpose();
+	if(vec.getColCount() == 1)
+		vec.transpose();
+	
+
+	
+	for(int index = 0 ; index < colCount; index++)
+	{
+		outVec.push_back(this->matrix[0][index] * vec[0][index]);
+	}
+	
+
+	return Matrix(vector<vector<float> > {outVec});
+}
 
 
+Matrix operator-(int number, Matrix &vecMat)
+{
+	vector<float> vecToBeMinused;
+	vector<float> resultVec;
+	Matrix resultMat;
+	
+	// Initialize the two vector
+	vecToBeMinused = vecMat.getVector();
+	resultVec.resize(vecToBeMinused.size());
+
+	// Minus the vector
+	for(int index = 0; index < (int)vecToBeMinused.size(); index++)
+	{
+		resultVec[index] = number - vecToBeMinused[index];
+	}
+
+	// Use the result vector to set the result matrix
+	resultMat.setMatrix(vector<vector<float> >{resultVec});
+	
+	return resultMat;
+}
 
 
 

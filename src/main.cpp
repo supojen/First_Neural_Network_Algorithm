@@ -33,20 +33,13 @@ int main()
     Matrix mat(vector<vector<float> >
               {
                  vector<float>{1,2,3},
-                 vector<float>{1,2,3},
-                 vector<float>{1,2,3}
               });
-    
-    Matrix vec(vector<vector<float> >
-              {
-                 vector<float>{0,2,3},
-              });
-   
-    cout << vec.transpose();
-    cout << vec;
-    cout << vec.transpose();
-    cout << vec;
 
+    Matrix vec(vector<vector<float> >
+            {
+                vector<float>{1,2,3},
+            });
+    cout <<  (1 - mat) * vec.transpose();
 
 
     return 0;
