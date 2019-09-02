@@ -51,14 +51,14 @@ void FeedFowardAI::initialWeightMatrix()
 }
 
 
-
+// This function need to be tested
 //*********************************************************************************
 vector<float> FeedFowardAI::query(vector<float> inputVector)
 {
     Matrix outputMatrix;
     Matrix inputMatrix(vector<vector<float> > {inputVector});
 
-    
+
     outputMatrix = this->WeightsInputHidden * inputMatrix.transpose();
     this->activationFunction(outputMatrix);
     outputMatrix = this->WeightsHiddenOutput * outputMatrix;
@@ -69,23 +69,43 @@ vector<float> FeedFowardAI::query(vector<float> inputVector)
 }
 
 
-
+//This function need to be tested
 //*********************************************************************************
 void FeedFowardAI::trainForOneTime(vector<float> inputVec, vector<float> targetVec)
 {
     // Step1: calculate the output vector(Both finalOutput and hiddenOutput)
     Matrix inputMat(vector<vector<float> > {inputVec});  //CALC & CALC  - represeting the input vector
-    Matrix tempMat;                                    //CALC & CALC  - use as a holder for abstracting hiddenOutput and finalOutput
+    Matrix tempMat;                                      //CALC & CALC  - use as a holder for abstracting hiddenOutput and finalOutput
     vector<float> hiddenOutputVec;                       //CALC & OUT   - representing the hidden output vector
     vector<float> finalOutputVec;                        //CALC & OUT   - representing the final output vector
 
+    
     tempMat = this->WeightsInputHidden * inputMat.transpose();
     this->activationFunction(tempMat);
-    hiddenOutputVec = tempMat.getVector();
-    tempMat = this->WeightsHiddenOutput * tempMat;
+    /*========= testing block ==============/
+    cout << "tempMat:" << tempMat;
+    //======================================*/
+    hiddenOutputVec = tempMat.getVector();          // getting the hidden output vector
+    /*========= testing block ==============/
+    cout << "The size of WeightsHiddenOutput is: " 
+         << this->WeightsHiddenOutput.getRowCount()
+         << "*"
+         << this->WeightsHiddenOutput.getColCount()
+         << endl;
+    cout << "The size of tempMat is: "
+         << tempMat.getRowCount()
+         << "*"
+         << tempMat.getColCount()
+         << endl;
+    //======================================*/
+    tempMat = this->WeightsHiddenOutput * tempMat.transpose();  // producing the final output (這行有問題)
     this->activationFunction(tempMat);
-    finalOutputVec = tempMat.getVector();
+    finalOutputVec = tempMat.getVector();            // getting the final output vector
     
+
+
+
+
     
     // Step2: calculate the error
     //              outputError = |targetVec - outputVec|
@@ -98,32 +118,61 @@ void FeedFowardAI::trainForOneTime(vector<float> inputVec, vector<float> targetV
         
 
     outputErrorMat = targetVecMat - finalOutputVecMat;
-    hiddenErrorMat = this->WeightsHiddenOutput.transpose() - outputErrorMat.transpose();
+    hiddenErrorMat = this->WeightsHiddenOutput.transpose() * outputErrorMat.transpose(); 
     this->WeightsHiddenOutput.transpose();
     outputErrorMat.transpose();
     hiddenErrorMat.transpose();
 
 
 
+    
     // Step 3: update the weight matrix
     Matrix updateWHO;
     Matrix updateWIH;
 
     updateWHO = this->learningRate * 
-                outputErrorMat.corresＭutiVV(
-                finalOutputVecMat.corresＭutiVV(
-                (1 - finalOutputVecMat))).transpose() * 
+                Matrix::corresＭutiVV( 
+                        outputErrorMat,
+                        Matrix::corresＭutiVV(finalOutputVecMat, (1-finalOutputVecMat))).transpose() *
                 hiddenOutputVecMat;
+    //========= testing block ==============/
+    cout << endl << "The size of hiddenOutputVecMat: " << endl; 
+    hiddenOutputVecMat.displayMatrixSize();
 
-    updateWIH = this->learningRate *
-                hiddenErrorMat.corresＭutiVV(
-                hiddenOutputVecMat.corresＭutiVV(
-                (1 - hiddenOutputVecMat))).transpose() *
+    cout << endl << "The size of updateWHO: " << endl; 
+    updateWHO.displayMatrixSize();
+
+    cout << endl << "The size of hiddenErrorMat: " << endl; 
+    hiddenErrorMat.displayMatrixSize();
+
+    cout << endl << "The size of hiddenOutputVecMat: " << endl;
+    hiddenOutputVecMat.displayMatrixSize();
+
+    cout << endl << "The size of (1 - hiddenOutputVecMat): " << endl;
+    (1 - hiddenErrorMat).displayMatrixSize();
+
+    cout << endl << "The size of corresMultiVV(hiddenOutputVecMat, (1-hiddenOutputVecMat)): " <<endl;
+    Matrix::corresＭutiVV(hiddenOutputVecMat, (1-hiddenOutputVecMat)).displayMatrixSize();
+
+    cout << endl << "The size of corresＭutiVV(hiddenErrorMat,corresＭutiVV(hiddenOutputVecMat,(1 - hiddenOutputVecMat)): " << endl;
+    Matrix::corresＭutiVV(hiddenErrorMat,Matrix::corresＭutiVV(hiddenOutputVecMat,(1 - hiddenOutputVecMat))).displayMatrixSize();
+
+    cout << endl << "The size of inputMat: " << endl;
+    inputMat.displayMatrixSize();
+    //======================================*/
+    updateWIH = this->learningRate * 
+                Matrix::corresＭutiVV(
+                         hiddenErrorMat,
+                         Matrix::corresＭutiVV(hiddenOutputVecMat,(1 - hiddenOutputVecMat))).transpose() *
                 inputMat;
+    
+
+                                        
+
 
     this->WeightsHiddenOutput = this->WeightsHiddenOutput + updateWHO;
     this->WeightsInputHidden  = this->WeightsInputHidden  + updateWIH;
-        
+    
 }
 
 
@@ -157,4 +206,28 @@ void FeedFowardAI::activationFunction(Matrix& inputVec)
     {
         inputVec[index][0] = 1 / (1 + exp(inputVec[index][0]));
     }
+}
+
+
+
+
+Matrix FeedFowardAI::getWeightInputHidden() const
+{
+    return this->WeightsInputHidden;
+}
+
+Matrix FeedFowardAI::getWeightHiddenOutput() const
+{
+    return this->WeightsHiddenOutput;
+}
+
+void FeedFowardAI::setWeightInputHidden( vector<vector<float> > weightInputHidden)
+{
+    this->WeightsInputHidden = weightInputHidden;
+}
+
+
+void FeedFowardAI::setWeightHiddenOutput( vector<vector<float> > weightHiddenOutput)
+{
+    this->WeightsHiddenOutput = weightHiddenOutput;
 }

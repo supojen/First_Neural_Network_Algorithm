@@ -2,13 +2,14 @@
 #include <vector>
 #include <iostream>
 #include <iomanip>
+#include <exception>
 using namespace std;
 
 class Matrix
 {
 	private:
-		static const int MARGINE_SIZE = 10;
-		vector< vector<float> > matrix;          //CALC & OUT  - All the transactions from the csv file
+		static const int MARGINE_SIZE = 10;      // Const       - This variable is for printing the matrix, representing that we have the maximam 10 digits
+		vector< vector<float> > matrix;          // CALC & OUT  - All the transactions from the csv file
 		int rowCount;
 		int colCount;
 	public:
@@ -16,8 +17,10 @@ class Matrix
 		Matrix(int rowCount, int colCount);
 		Matrix(vector< vector<float> > matrix);
 
-
+		// About matrix multiply matrix
 		Matrix operator*(Matrix &rightMatrix);
+
+
 		Matrix operator*(float scaler);
 		friend Matrix operator*(float scaler, Matrix mat);
 		Matrix operator+(Matrix &rightMatrix);
@@ -32,7 +35,7 @@ class Matrix
 		Matrix& transpose();
 
 		// The following two function is for helping updating the weight of feed forward AI
-		Matrix corresＭutiVV(Matrix vector); 
+		static Matrix corresＭutiVV(Matrix vec1, Matrix vec2); 
 		friend Matrix operator-(int number, Matrix &vecMat);
 
 		void setMatrixSize(int rowCount, int colCount);
@@ -41,6 +44,7 @@ class Matrix
 		vector<float> getVector();
 		int getRowCount();
 		int getColCount();
+		vector<vector<float> >& getMatrixValue();
 		
 		
 		//these are the function which helping us to do the multiplication of matrix

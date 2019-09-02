@@ -10,6 +10,11 @@ Matrix::Matrix()
 //************************************************************
 Matrix::Matrix(int rowCount, int colCount)
 {
+	// Define the matrix size
+	this->rowCount = rowCount;
+	this->colCount = colCount;
+
+	// Define the actually matrix size
 	this->matrix.resize(rowCount);
 	for(auto &row : this->matrix)
 	{
@@ -47,6 +52,9 @@ Matrix::Matrix(vector<vector<float>> matrix)
 
 Matrix Matrix::operator*(Matrix & rightMatrix)
 { 
+	if(this->colCount != rightMatrix.rowCount)
+		throw "Left mat's col number is not equal to right mat's row...";
+
 	vector<vector<float> > vectors;
 
 	for(auto &rowForLeft : this->matrix)
@@ -112,6 +120,7 @@ Matrix Matrix::operator+(Matrix & rightMatrix)
 }
 
 
+// I am debugging this function now 
 //************************************************************
 Matrix Matrix::operator-(Matrix &rightMatrix)
 {
@@ -196,6 +205,15 @@ Matrix& Matrix::transpose()
 }
 
 
+/**
+ * @brief : 
+ * 		set the matrix's size
+ * 
+ * @param rowCount : 
+ * 		representing the matrix 's row number
+ * @param colCount :
+ * 		representing the matrix 's col number
+ */
 void Matrix::setMatrixSize(int rowCount, int colCount)
 {
 	this->rowCount = rowCount;
@@ -239,20 +257,21 @@ int Matrix::getColCount()
 }
 
 // Correspond Multiplication for Vector and Vector
-Matrix Matrix::corresＭutiVV(Matrix vec)
+Matrix Matrix::corresＭutiVV(Matrix vec1, Matrix vec2)
 {
 	vector<float> outVec;
+	int colCount;
 
-	if(this->colCount == 1)
-		this->transpose();
-	if(vec.getColCount() == 1)
-		vec.transpose();
+	if(vec1.getColCount() == 1)
+		vec1.transpose();
+	if(vec2.getColCount() == 1)
+		vec2.transpose();
 	
-
+	colCount = vec1.getColCount();
 	
 	for(int index = 0 ; index < colCount; index++)
 	{
-		outVec.push_back(this->matrix[0][index] * vec[0][index]);
+		outVec.push_back(vec1[0][index] * vec2[0][index]);
 	}
 	
 
@@ -332,7 +351,16 @@ vector<float> Matrix::LinearCombiVectorMatrix(vector<float> vec,const Matrix& ma
 
 void Matrix::displayMatrixSize()
 {
-	cout << "matrix row size = " << this->rowCount << " : " << this->matrix.size() << endl;
-	cout << "matrix col size = " << this->colCount << " : " << this->matrix[0].size() << endl;
+	cout << "Matrix size: " << 
+		 this->rowCount << " * " << this->colCount << endl;
+	cout << "Actually matrix size: "
+		 << this->matrix.size() << " * " << this->matrix[0].size() << endl;
 }
 
+
+
+
+vector<vector<float> >& Matrix::getMatrixValue()
+{
+	return this->matrix;
+}
