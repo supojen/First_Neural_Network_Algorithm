@@ -51,7 +51,9 @@ class FeedFowardAI
         void setWeightInputHidden( vector<vector<float> > weightInputHidden);
         void setWeightHiddenOutput( vector<vector<float> > weightHiddenOutput);
 
-    private:
+
+
+    public:
         //This part is helping us to do some culculating 
         static float sigmoid(float inputValue);
         static void activationFunction(Matrix& inputVec);

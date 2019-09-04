@@ -33,30 +33,10 @@ int main()
     FeedFowardAI ai(784,100,10,0.3);
     InteractionWithSQL database;
     
-
-    Matrix m1 { vector<vector<float> > { {1,2,3} } };
-    Matrix m2 { vector<vector<float> > { {1},{2},{3} } };
-    Matrix m3 = Matrix::corresＭutiVV(m1, m2);
-    vector<float> vec = m3.getVector();
-    cout << "corresMutiVV" << endl;
-    for(auto &value : vec)
-    {
-        cout << value << ",";
-    }
-    cout << endl;
-
-
     /*
-    database.deserializeAI(ai,3,3,3);
-    cout << "========= Input Hidden Weight Mat =========" << endl;
-    cout << ai.getWeightInputHidden();
-    cout << "========= Hidden Output Weight Mat =========" << endl;
-    cout << ai.getWeightHiddenOutput();
+    FeedFowardAI ai(5,4,3,0.3);
+    ai.trainForOneTime(vector<float> {1,0,0,0,0}, vector<float> {1,0,0});
     */
-    
-    
-
-
 
     
     //train the AI
@@ -78,19 +58,23 @@ int main()
         cout << "The expect output:" << expOutput << endl;
         //======================================/
         outputVec[expOutput] = 1.0;
-        ai.trainForOneTime(inputs, outputVec);
-        
+
+        try{
+            ai.trainForOneTime(inputs, outputVec);
+        }catch(const char* str)
+        {
+            cout << str << endl;
+        }
 
         inputs.clear();
     }
     trainFile.close();
-
-
     database.storeWeightMatIntoDB(ai);
     
     
     
     //use the AI
+    
     fstream testFile("mnist_test_10.csv");
 
 
@@ -108,8 +92,7 @@ int main()
         
         answerVec = ai.query(inputs);
 
-
-        
+   
         int index = 0;
         auto maxOutputNode = max_element(answerVec.begin(), answerVec.end());
         for(auto iter = answerVec.begin() ; iter < answerVec.end(); iter++)
@@ -120,7 +103,16 @@ int main()
         }
         
         cout << "output value is " << outputValue << endl;
-
+        if(outputValue == expOutput)
+        {
+            cout << "Correct!" << endl;
+        }
+        else
+        {
+            cout << "Wrong!" << endl;
+        }
+        
+        
         inputs.clear();
         
     }

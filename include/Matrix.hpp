@@ -8,7 +8,7 @@ using namespace std;
 class Matrix
 {
 	private:
-		static const int MARGINE_SIZE = 10;      // Const       - This variable is for printing the matrix, representing that we have the maximam 10 digits
+		static const int MARGINE_SIZE = 15;      // Const       - This variable is for printing the matrix, representing that we have the maximam 10 digits
 		vector< vector<float> > matrix;          // CALC & OUT  - All the transactions from the csv file
 		int rowCount;
 		int colCount;

@@ -52,15 +52,41 @@ Matrix::Matrix(vector<vector<float>> matrix)
 
 Matrix Matrix::operator*(Matrix & rightMatrix)
 { 
-	if(this->colCount != rightMatrix.rowCount)
+	//Decide weather we want to do the regular matrix multiplication or the corresponnded vectors multiplication
+	bool multiplyCorresponded = 
+						((this->colCount == 1 && rightMatrix.colCount == 1) && 
+						 (this->rowCount == rightMatrix.rowCount)) 
+											||
+						((this->rowCount == 1 && rightMatrix.rowCount == 1) && 
+						 (this->colCount == rightMatrix.colCount));
+
+
+	/*
+	if(this->colCount != rightMatrix.rowCount && !multiplyCorresponded)
 		throw "Left mat's col number is not equal to right mat's row...";
+	*/
 
 	vector<vector<float> > vectors;
 
-	for(auto &rowForLeft : this->matrix)
+	if(!multiplyCorresponded)
 	{
-		vectors.push_back( this->LinearCombiVectorMatrix(rowForLeft, rightMatrix) );
+		for(auto &rowForLeft : this->matrix)
+		{
+			vectors.push_back( this->LinearCombiVectorMatrix(rowForLeft, rightMatrix) );
+		}
 	}
+	else
+	{
+		Matrix tmpMat;
+		vector<float> tmpVec;
+		
+		tmpMat = corresＭutiVV(*this, rightMatrix);
+		tmpVec = tmpMat.getVector();
+		vectors.push_back(tmpVec);
+
+	}
+	
+
 
 	return Matrix(vectors);
 }
@@ -308,9 +334,10 @@ vector<float> Matrix::addVector(vector<float> v1, vector<float> v2)
 {
 	vector<float> outputVec;
 
-
+	/*
 	if(v1.size() != v2.size())
 		throw "The two vectors cannot be added!!";
+	*/
 
 	for(auto index = 0; index < (int)v1.size(); index++)
 	{
@@ -355,6 +382,7 @@ void Matrix::displayMatrixSize()
 		 this->rowCount << " * " << this->colCount << endl;
 	cout << "Actually matrix size: "
 		 << this->matrix.size() << " * " << this->matrix[0].size() << endl;
+
 }
 
 
